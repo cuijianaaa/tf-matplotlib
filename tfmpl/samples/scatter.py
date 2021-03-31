@@ -12,7 +12,7 @@ import tfmpl
 
 if __name__ == '__main__':
 
-    with tf.Session(graph=tf.Graph()) as sess:
+    with tf.compat.v1.Session(graph=tf.Graph()) as sess:
         
         @tfmpl.figure_tensor
         def draw_scatter(scaled, colors): 
@@ -27,17 +27,17 @@ if __name__ == '__main__':
             return figs  
 
         points = tf.constant(np.random.normal(loc=0.0, scale=1.0, size=(100, 2)).astype(np.float32))
-        scale = tf.placeholder(tf.float32)        
+        scale = tf.compat.v1.placeholder(tf.float32)        
         scaled = points*scale
        
         image_tensor = draw_scatter(scaled, ['r', 'g'])
-        image_summary = tf.summary.image('scatter', image_tensor)
-        all_summaries = tf.summary.merge_all()
+        image_summary = tf.compat.v1.summary.image('scatter', image_tensor)
+        all_summaries = tf.compat.v1.summary.merge_all()
 
         os.makedirs('log', exist_ok=True)
         now = datetime.now()
         logdir = "log/" + now.strftime("%Y%m%d-%H%M%S") + "/"
-        writer = tf.summary.FileWriter(logdir, sess.graph)
+        writer = tf.compat.v1.summary.FileWriter(logdir, sess.graph)
 
         summary = sess.run(all_summaries, feed_dict={scale: 2.})
         writer.add_summary(summary, global_step=0)

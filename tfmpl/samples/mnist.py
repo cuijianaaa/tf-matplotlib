@@ -38,39 +38,39 @@ def draw_confusion_matrix(matrix):
 if __name__ == '__main__':    
     mnist = input_data.read_data_sets("MNIST_data/", one_hot=True)
 
-    with tf.Session(graph=tf.Graph()) as sess:
+    with tf.compat.v1.Session(graph=tf.Graph()) as sess:
 
         # Create the model
-        x = tf.placeholder(tf.float32, [None, 784])
+        x = tf.compat.v1.placeholder(tf.float32, [None, 784])
         W = tf.Variable(tf.zeros([784, 10]))
         b = tf.Variable(tf.zeros([10]))
         y = tf.matmul(x, W) + b
 
-        y_ = tf.placeholder(tf.float32, [None, 10])
+        y_ = tf.compat.v1.placeholder(tf.float32, [None, 10])
         cross_entropy = tf.reduce_mean(
-            tf.nn.softmax_cross_entropy_with_logits_v2(labels=y_, logits=y)
+            input_tensor=tf.nn.softmax_cross_entropy_with_logits(labels=y_, logits=y)
         )
-        train = tf.train.GradientDescentOptimizer(1e-3).minimize(cross_entropy)
+        train = tf.compat.v1.train.GradientDescentOptimizer(1e-3).minimize(cross_entropy)
 
-        preds = tf.argmax(y, 1)
-        labels = tf.argmax(y_, 1)
+        preds = tf.argmax(input=y, axis=1)
+        labels = tf.argmax(input=y_, axis=1)
 
         # Compute confusion matrix
-        matrix = tf.confusion_matrix(labels, preds, num_classes=10)
+        matrix = tf.math.confusion_matrix(labels=labels, predictions=preds, num_classes=10)
 
         # Get a image tensor for summary usage
         image_tensor = draw_confusion_matrix(matrix)
 
-        image_summary = tf.summary.image('confusion_matrix', image_tensor)
-        all_summaries = tf.summary.merge_all()
+        image_summary = tf.compat.v1.summary.image('confusion_matrix', image_tensor)
+        all_summaries = tf.compat.v1.summary.merge_all()
 
         os.makedirs('log', exist_ok=True)
         now = datetime.now()
         logdir = "log/" + now.strftime("%Y%m%d-%H%M%S") + "/"
-        writer = tf.summary.FileWriter(logdir, sess.graph)
+        writer = tf.compat.v1.summary.FileWriter(logdir, sess.graph)
         
         # Train
-        sess.run(tf.global_variables_initializer())
+        sess.run(tf.compat.v1.global_variables_initializer())
         for i in range(1000):            
             batch_xs, batch_ys = mnist.train.next_batch(10)
             sess.run(train, feed_dict={x: batch_xs, y_: batch_ys})
@@ -82,6 +82,5 @@ if __name__ == '__main__':
                 writer.flush()
 
         correct_prediction = tf.equal(preds, labels)
-        accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
+        accuracy = tf.reduce_mean(input_tensor=tf.cast(correct_prediction, tf.float32))
         print(sess.run(accuracy, feed_dict={x: mnist.test.images, y_: mnist.test.labels}))
-    

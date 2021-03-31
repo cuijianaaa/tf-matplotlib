@@ -16,19 +16,19 @@ import tfmpl
 
 if __name__ == '__main__':
 
-    with tf.Session(graph=tf.Graph()) as sess:
+    with tf.compat.v1.Session(graph=tf.Graph()) as sess:
 
         def beale(x, y):
             '''Beale surface for optimization tests.'''
-            with tf.name_scope('beale', [x, y]):
+            with tf.compat.v1.name_scope('beale', [x, y]):
                 return (1.5 - x + x*y)**2 + (2.25 - x + x*y**2)**2 + (2.625 - x + x*y**3)**2
 
         # List of optimizers to compare
         optimizers = [
-            (tf.train.GradientDescentOptimizer(1e-3), 'SGD'),
-            (tf.train.AdagradOptimizer(1e-1), 'Adagrad'),
-            (tf.train.AdadeltaOptimizer(1e2), 'Adadelta'),
-            (tf.train.AdamOptimizer(1e-1), 'Adam'),            
+            (tf.compat.v1.train.GradientDescentOptimizer(1e-3), 'SGD'),
+            (tf.compat.v1.train.AdagradOptimizer(1e-1), 'Adagrad'),
+            (tf.compat.v1.train.AdadeltaOptimizer(1e2), 'Adadelta'),
+            (tf.compat.v1.train.AdamOptimizer(1e-1), 'Adam'),            
         ]
 
         paths = []        
@@ -72,8 +72,8 @@ if __name__ == '__main__':
             return paths
 
         # Create variables for each optimizer
-        start = tf.constant_initializer([3., 4.], dtype=tf.float32)
-        xys = [tf.get_variable(f'xy_{o[1]}', 2, tf.float32, initializer=start) for o in optimizers]        
+        start = tf.compat.v1.constant_initializer([3., 4.], dtype=tf.float32)
+        xys = [tf.compat.v1.get_variable(f'xy_{o[1]}', 2, tf.float32, initializer=start) for o in optimizers]        
         zs = [beale(xy[0], xy[1]) for xy in xys]
 
         # Define optimization target
@@ -85,17 +85,17 @@ if __name__ == '__main__':
 
         # Generate summary
         image_tensor = draw(tf.stack(xys), tf.stack(zs))
-        image_summary = tf.summary.image('optimization', image_tensor)        
-        all_summaries = tf.summary.merge_all()
+        image_summary = tf.compat.v1.summary.image('optimization', image_tensor)        
+        all_summaries = tf.compat.v1.summary.merge_all()
 
         # Alloc summary writer
         os.makedirs('log', exist_ok=True)
         now = datetime.now()
         logdir = "log/" + now.strftime("%Y%m%d-%H%M%S") + "/"
-        writer = tf.summary.FileWriter(logdir, sess.graph)
+        writer = tf.compat.v1.summary.FileWriter(logdir, sess.graph)
 
         # Run optimization, write summary every now and then.
-        init = tf.global_variables_initializer()
+        init = tf.compat.v1.global_variables_initializer()
         sess.run(init)
         for i in range(200):              
             if i % 10 == 0:

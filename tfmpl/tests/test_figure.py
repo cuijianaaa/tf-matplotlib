@@ -21,9 +21,9 @@ def test_arguments():
 
         return tfmpl.create_figure()
 
-    with tf.Session(graph=tf.Graph()) as sess:
+    with tf.compat.v1.Session(graph=tf.Graph()) as sess:
         a = tf.constant(0)
-        c = tf.placeholder(tf.float32)
+        c = tf.compat.v1.placeholder(tf.float32)
 
         tensor = draw(a, [0,1], c, d='d', e='e')
         sess.run(tensor, feed_dict={c: np.zeros((2,2))})
@@ -47,9 +47,9 @@ def test_arguments_blittable():
     def draw(a, b, c, d=None, e=None):
         debug['args'] = [a, b, c, d, e]
 
-    with tf.Session(graph=tf.Graph()) as sess:
+    with tf.compat.v1.Session(graph=tf.Graph()) as sess:
         a = tf.constant(0)
-        c = tf.placeholder(tf.float32)
+        c = tf.compat.v1.placeholder(tf.float32)
 
         tensor = draw(a, [0,1], c, d='d', e='e')
         sess.run(tensor, feed_dict={c: np.zeros((2,2))})
@@ -78,8 +78,8 @@ def test_callcount():
         debug['a'].append(a)        
         return tfmpl.create_figure()
 
-    with tf.Session(graph=tf.Graph()) as sess:
-        a = tf.placeholder(tf.float32)
+    with tf.compat.v1.Session(graph=tf.Graph()) as sess:
+        a = tf.compat.v1.placeholder(tf.float32)
 
         tensor = draw(a)
 
@@ -107,8 +107,8 @@ def test_callcount_blittable():
         debug['draw_called'] += 1
         debug['a'].append(a)        
         
-    with tf.Session(graph=tf.Graph()) as sess:
-        a = tf.placeholder(tf.float32)
+    with tf.compat.v1.Session(graph=tf.Graph()) as sess:
+        a = tf.compat.v1.placeholder(tf.float32)
 
         tensor = draw(a)
 
@@ -138,8 +138,8 @@ def test_callcount_blittable():
         debug['draw_called'] += 1
         debug['a'].append(a)        
         
-    with tf.Session(graph=tf.Graph()) as sess:
-        a = tf.placeholder(tf.float32)
+    with tf.compat.v1.Session(graph=tf.Graph()) as sess:
+        a = tf.compat.v1.placeholder(tf.float32)
 
         tensor = draw(a)
 
@@ -162,8 +162,8 @@ def test_draw():
         
         return figs
 
-    with tf.Session(graph=tf.Graph()) as sess:
-        a = tf.placeholder(tf.float32)
+    with tf.compat.v1.Session(graph=tf.Graph()) as sess:
+        a = tf.compat.v1.placeholder(tf.float32)
 
         tensor = draw()
 
@@ -190,8 +190,8 @@ def test_draw_blittable():
         rect.set_xy((t,t))
         return rect
 
-    with tf.Session(graph=tf.Graph()) as sess:
-        t = tf.placeholder(tf.float32)
+    with tf.compat.v1.Session(graph=tf.Graph()) as sess:
+        t = tf.compat.v1.placeholder(tf.float32)
         tensor = draw(t)
 
         imgs = sess.run(tensor, feed_dict={t:0})
@@ -202,4 +202,3 @@ def test_draw_blittable():
         imgs = sess.run(tensor, feed_dict={t:0.5})
         assert imgs.shape == (1, 400, 400, 3)
         np.testing.assert_allclose(imgs[0, 200:240, 200:240], np.tile([0, 255, 0], (40, 40, 1)))
-            
